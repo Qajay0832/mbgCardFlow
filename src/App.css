@@ -1,0 +1,44 @@
+.custom-node:hover {
+  border: 2px solid #4a90e2;
+}
+
+.custom-node {
+  padding: 5px;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  width: 200px;
+  text-align: "center";
+  background-color: "#fff";
+}
+
+.sidebar {
+  width: 300px;
+  background: "#f5f5f5";
+  padding: 20px;
+  border-right: "1px solid #ddd";
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sidebarInput {
+  width: "100%";
+  padding: 8px;
+  margin-top: 10px;
+  border-radius: 4px;
+}
+
+.sidebarButton {
+  margin-top: 10px;
+  width: "100%";
+  padding: 10px;
+  background-color: "#4CAF50";
+  color: "white";
+  border: "none";
+  border-radius: 4px;
+}
+
+.sidebarButton:hover {
+  background-color: "#45a049";
+  cursor: pointer;
+}
