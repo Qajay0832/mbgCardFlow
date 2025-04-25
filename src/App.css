@@ -36,9 +36,14 @@
   color: "white";
   border: "none";
   border-radius: 4px;
+  color: white;
+  text-decoration: none;
 }
 
 .sidebarButton:hover {
   background-color: "#45a049";
   cursor: pointer;
+}
+.navbar{
+  position: fixed;
 }

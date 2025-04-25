@@ -1,4 +1,6 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addItem } from "./redux/DataSlice";
 import ReactFlow, {
   Controls,
   MiniMap,
@@ -11,47 +13,41 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import { useReactFlow } from "reactflow";
 import "./App.css";
+import { Link } from "react-router-dom";
 
 const CustomProductNode = ({ data }) => {
   return (
     <div className="custom-node">
       <Handle type="source" position="right" style={{ background: "#555" }} />
       <h4>{data.name}</h4>
-      {data.extraContent.map((c, i) => {
-        if (typeof c === "string") {
-          return (
-            <div
-              key={i}
-              style={{
-                background: "#f0f0f0",
-                padding: 5,
-                borderRadius: 4,
-                marginBottom: 4,
-              }}
-            >
-              {c}
-            </div>
-          );
-        } else if (c.type === "button") {
-          return (
+      {data.extraContent.map((c, i) => (
+        <div
+          key={i}
+          style={{
+            background: "#f0f0f0",
+            padding: 5,
+            borderRadius: 4,
+            marginBottom: 4,
+          }}
+        >
+          <div>{c.content}</div>
+          {c.button && (
             <button
-              key={i}
               style={{
                 background: "#1976d2",
                 color: "#fff",
                 padding: "5px 10px",
                 border: "none",
                 borderRadius: "4px",
-                marginBottom: 4,
+                marginTop: 4,
                 cursor: "pointer",
               }}
             >
-              {c.value}
+              {c.button}
             </button>
-          );
-        }
-        return null;
-      })}
+          )}
+        </div>
+      ))}
 
       <Handle type="target" position="left" style={{ background: "#555" }} />
     </div>
@@ -77,6 +73,19 @@ export default function FlowCanvas() {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [inputValue, setInputValue] = useState("");
   const [selectedNode, setSelectedNode] = useState(null);
+  const [btnNumber, setBtnNumber] = useState(0);
+  const dispatch = useDispatch();
+  const items = useSelector((state) => state.custom.items);
+  console.log("Items from Redux:", items);
+
+  const handleAdd = () => {
+    dispatch(
+      addItem({
+        name: `Node ${items.length + 1}`,
+        data: { nodes: nodes, edges: edges },
+      })
+    );
+  };
 
   const onConnect = (params) => {
     // New node to create when an edge is drawn
@@ -98,25 +107,28 @@ export default function FlowCanvas() {
   const onNodeClick = useCallback((e, node) => {
     setSelectedNode(node); // Set the selected node for content addition
   }, []);
-  const handleAddButton = (label) => {
-    if (!label.trim() || !selectedNode) return;
-
-    const newButtonContent = {
-      type: "button",
-      value: label,
-    };
+  const handleAddButton = () => {
+    if (!selectedNode) return;
 
     setNodes((nds) =>
       nds.map((node) => {
         if (node.id === selectedNode.id) {
+          const contents = [...(node.data.extraContent || [])];
+
+          const last = contents[contents.length - 1];
+          if (!last.content) {
+            alert("Last item is not content. Cannot attach button.");
+            return node;
+          }
+
+          const updatedLast = { ...last, button: `Button ${btnNumber}` };
+          contents[contents.length - 1] = updatedLast;
+
           return {
             ...node,
             data: {
               ...node.data,
-              extraContent: [
-                ...(node.data.extraContent || []),
-                newButtonContent,
-              ],
+              extraContent: contents,
             },
           };
         }
@@ -125,6 +137,7 @@ export default function FlowCanvas() {
     );
 
     setInputValue("");
+    setBtnNumber((prev) => prev + 1);
   };
 
   const handleAddContent = () => {
@@ -135,7 +148,10 @@ export default function FlowCanvas() {
         if (node.id === selectedNode.id) {
           const updatedData = {
             ...node.data,
-            extraContent: [...(node.data.extraContent || []), inputValue],
+            extraContent: [
+              ...(node.data.extraContent || []),
+              { content: inputValue }, // 👈 push as object
+            ],
           };
           return { ...node, data: updatedData };
         }
@@ -145,6 +161,7 @@ export default function FlowCanvas() {
 
     setInputValue("");
   };
+
   const [connectingNode, setConnectingNode] = useState(null);
 
   const onConnectStart = (_, { nodeId }) => {
@@ -208,9 +225,32 @@ export default function FlowCanvas() {
   };
 
   const { project } = useReactFlow();
+  useEffect(() => {
+    console.log("Updated Nodes:", nodes);
+    console.log("Updated Edges:", edges);
+  }, [nodes, edges]);
 
   return (
-    <div style={{ display: "flex", width: "100%", height: "100vh" }}>
+    <div
+      className="reactflow-wrapper"
+      style={{ display: "flex", width: "100%", height: "100vh" }}
+    >
+      <div className="navbar">
+        <button
+          className="sidebarButton"
+          style={{ background: "#1976d2", marginTop: 8 }}
+          onClick={handleAdd}
+        >
+          Add Your Flow
+        </button>
+        <Link
+          to={"/flow"}
+          className="sidebarButton"
+          style={{ background: "#1976d2", marginTop: 8 }}
+        >
+          View Flows
+        </Link>
+      </div>
       {selectedNode && (
         <div className="sidebar">
           <h3>Details</h3>
@@ -222,7 +262,11 @@ export default function FlowCanvas() {
             placeholder="Add content..."
             className="sidebarInput"
           />
-          <button onClick={handleAddContent} className="sidebarButton">
+          <button
+            onClick={handleAddContent}
+            style={{ background: "#1976d2", marginTop: 8 }}
+            className="sidebarButton"
+          >
             Add to Node
           </button>
           <button
