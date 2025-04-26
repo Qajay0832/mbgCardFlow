@@ -1,38 +1,13 @@
-import { useState } from "react";
+import React from 'react'
 
-const Card = ({ data }) => {
-  console.log("data:", data);
-  //   const nodeId = data.id;
-  //   const newData = ;
-  const [item, setItem] = useState([]);
-  const [newEdges, setNewEdges] = useState([]);
-  const addItem = (item, nodeId) => {
-    setItem((prev) => [...prev, item]);
-
-    // setNewCard()
-    console.log("Item to add:", item, nodeId);
-    let belongingEdge =[];
-     data.data.edges.filter((edge) => {
-      if (edge.source === nodeId) return belongingEdge.push(parseInt(edge.target));
-    });
-    belongingEdge =
-      belongingEdge.length > 0 ? Array.from(new Set(belongingEdge)) : [];
-    setNewEdges(belongingEdge);
-    console.log("Belonging Edge:", belongingEdge);
-    
-    // Here you can dispatch an action or call a function to add the item
-    // For example:
-    // dispatch(addItem(item));
-  };
-
+const Card = ({data,item,addItem,node}) => {
   return (
     <div>
-      <div className="flex flex-col items-center justify-center h-full text-center px-4">
         <h2 className="text-2xl font-bold text-blue-800 mb-2">
-          {data.data.nodes[0].data.name}
+          {data?data.data.nodes[0].data.name:node.data.name}
         </h2>
-        {data.data.nodes[0].data.extraContent &&
-          data.data.nodes[0].data.extraContent.map((c, i) => (
+        {(data?data.data.nodes[0].data.extraContent:node.data.extraContent) &&
+          (data?data.data.nodes[0].data.extraContent:node.data.extraContent).map((c, i) => (
             <div
               key={i}
               style={{
@@ -54,7 +29,7 @@ const Card = ({ data }) => {
                     marginTop: 4,
                     cursor: "pointer",
                   }}
-                  onClick={() => addItem(c.content, data.data.nodes[0].id)}
+                  onClick={() => addItem(c.content, data?data.data.nodes[0].id:node.id)}
                 >
                   {c.button}
                 </button>
@@ -73,54 +48,8 @@ const Card = ({ data }) => {
             </ul>
           </div>
         )}
-        {newEdges.length > 0 &&
-          data.data.nodes
-            .filter((node) => newEdges.includes(parseInt(node.id)))
-            .map((node) => (
-              <>
-                <h2 className="text-2xl font-bold text-blue-800 mb-2">
-                  {node.data.name}
-                </h2>
-                {node.data.extraContent &&
-                  node.data.extraContent.map((c, i) => (
-                    <div
-                      key={i}
-                      style={{
-                        background: "#f0f0f0",
-                        padding: 5,
-                        borderRadius: 4,
-                        marginBottom: 4,
-                      }}
-                    >
-                      <div>{c.content}</div>
-                      {c.button && (
-                        <button
-                          style={{
-                            background: "#1976d2",
-                            color: "#fff",
-                            padding: "5px 10px",
-                            border: "none",
-                            borderRadius: "4px",
-                            marginTop: 4,
-                            cursor: "pointer",
-                          }}
-                          onClick={() =>
-                            addItem(c.content, data.data.nodes[0].id)
-                          }
-                        >
-                          {c.button}
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                
-              </>
-            ))}
-
-        <div className="flex flex-col items-center justify-center h-full text-center px-4"></div>
-      </div>
     </div>
-  );
-};
+  )
+}
 
-export default Card;
+export default Card

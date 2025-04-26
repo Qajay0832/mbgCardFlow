@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { data, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import Card from "./Card";
+import Cards from "./Cards";
 
 const ChatFlow = () => {
   const items = useSelector((state) => state.custom.items);
@@ -76,36 +76,7 @@ const ChatFlow = () => {
             </div>
 
             <div className="relative z-10 flex-1 overflow-y-auto p-4 md:p-6 space-y-3 md:space-y-4">
-              {selectedFlow&&<Card data={selectedFlow}/>}
-              {/* {selectedFlow.data.nodes.map((msg) => {
-                const isSentByUser = msg.senderId === user;
-                const time = new Date(msg.timestamp).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                });
-
-                return (
-                  <div
-                    key={msg.messageId}
-                    className={`flex ${
-                      isSentByUser ? "justify-end" : "justify-start"
-                    }`}
-                  >
-                    <div
-                      className={`px-4 py-2 rounded-lg shadow-md text-sm max-w-[75%] ${
-                        isSentByUser
-                          ? "bg-blue-500 text-white"
-                          : "bg-white text-gray-900"
-                      }`}
-                    >
-                      <div>{msg.message}</div>
-                      <div className="text-xs text-right mt-1 opacity-70">
-                        {time}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })} */}
+              {selectedFlow&&<Cards data={selectedFlow}/>}
             </div>
 
             <div className="relative z-10 p-3 bg-white border-t border-gray-300 flex items-center gap-2 shadow-inner">
